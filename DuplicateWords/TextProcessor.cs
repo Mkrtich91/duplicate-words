@@ -175,8 +175,7 @@ namespace UniqueWords
 
             for (int i = 0; i < parts.Length; i++)
             {
-                // Check if the part is a word
-                if (Regex.IsMatch(parts[i], @"\b[\p{L}]+\b"))
+                if (Regex.IsMatch(parts[i], @"\b\w+\b"))
                 {
                     string word = parts[i];
                     if (!uniqueWords.Contains(word))
@@ -206,9 +205,9 @@ namespace UniqueWords
         /// <exception cref="ArgumentNullException"><see cref="text"/> is null.</exception>
         public static void RemoveDuplicateWordsInString(ref string? text, bool ignoreCase)
         {
-            if (string.IsNullOrEmpty(text))
+            if (text == null)
             {
-                return;
+                throw new ArgumentNullException(nameof(text));
             }
 
             string[] parts = Regex.Split(text, @"(\b[\p{L}]+\b|\W+)");
@@ -217,7 +216,7 @@ namespace UniqueWords
 
             for (int i = 0; i < parts.Length; i++)
             {
-                if (Regex.IsMatch(parts[i], @"\b[\p{L}]+\b"))
+                if (Regex.IsMatch(parts[i], @"\b\w+\b"))
                 {
                     string word = parts[i];
                     if (!uniqueWords.Contains(word))
