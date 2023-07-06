@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace UniqueWords
 {
@@ -11,8 +12,32 @@ namespace UniqueWords
         /// <returns>The number of words that are duplicated in the <see cref="text"/>.</returns>
         public static int CountDuplicateWords(string text)
         {
-            // TODO #1. Analyze the method unit tests and add the method implementation.
-            throw new NotImplementedException();
+            string[] words = text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+            Dictionary<string, int> wordCounts = new Dictionary<string, int>();
+
+            foreach (string word in words)
+            {
+                if (wordCounts.ContainsKey(word))
+                {
+                    wordCounts[word]++;
+                }
+                else
+                {
+                    wordCounts[word] = 1;
+                }
+            }
+
+            int duplicateCount = 0;
+            foreach (int count in wordCounts.Values)
+            {
+                if (count > 1)
+                {
+                    duplicateCount++;
+                }
+            }
+
+            return duplicateCount;
         }
 
         /// <summary>
@@ -22,11 +47,41 @@ namespace UniqueWords
         /// <returns>The total number of all words that are duplicated in the <see cref="lines"/> list.</returns>
         public static int GetTotalDuplicateWordsNumber(IList<string> lines)
         {
-            StringBuilder builder = new ();
-            Dictionary<string, int> counters = new ();
+            StringBuilder builder = new StringBuilder();
 
-            // TODO #2. Analyze the method unit tests and add the method implementation.
-            throw new NotImplementedException();
+            foreach (string line in lines)
+            {
+                builder.AppendLine(line);
+            }
+
+            string text = builder.ToString();
+
+            string[] words = text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+            Dictionary<string, int> wordCounts = new Dictionary<string, int>();
+
+            foreach (string word in words)
+            {
+                if (wordCounts.ContainsKey(word))
+                {
+                    wordCounts[word]++;
+                }
+                else
+                {
+                    wordCounts[word] = 1;
+                }
+            }
+
+            int duplicateCount = 0;
+            foreach (int count in wordCounts.Values)
+            {
+                if (count > 1)
+                {
+                    duplicateCount += count;
+                }
+            }
+
+            return duplicateCount;
         }
 
         /// <summary>
@@ -37,11 +92,32 @@ namespace UniqueWords
         /// <exception cref="ArgumentNullException"><see cref="lines"/> is null.</exception>
         public static IList<string> GetDuplicateWords(ICollection<string>? lines)
         {
-            HashSet<string> words = new ();
-            HashSet<string> duplicates = new ();
+            HashSet<string> words = new HashSet<string>();
 
-            // TODO #3. Analyze the method unit tests and add the method implementation.
-            throw new NotImplementedException();
+            HashSet<string> duplicates = new HashSet<string>();
+            if (lines == null)
+            {
+                throw new ArgumentNullException(nameof(lines));
+            }
+
+            foreach (string line in lines)
+            {
+                string[] lineWords = line.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string word in lineWords)
+                {
+                    if (words.Contains(word))
+                    {
+                        duplicates.Add(word);
+                    }
+                    else
+                    {
+                        words.Add(word);
+                    }
+                }
+            }
+
+            return duplicates.ToList();
         }
 
         /// <summary>
@@ -53,8 +129,32 @@ namespace UniqueWords
         /// <exception cref="ArgumentNullException"><see cref="lines"/> is null.</exception>
         public static ICollection<string> GetUniqueWords(IEnumerable<string>? lines, bool ignoreCase)
         {
-            // TODO #4. Analyze the method unit tests and add the method implementation.
-            throw new NotImplementedException();
+            if (lines == null)
+            {
+                throw new ArgumentNullException(nameof(lines));
+            }
+
+            var comparer = ignoreCase ? StringComparer.InvariantCultureIgnoreCase : StringComparer.InvariantCulture;
+            var uniqueWords = new Dictionary<string, bool?>(comparer);
+
+            foreach (var line in lines)
+            {
+                var words = line.Split(new[] { ' ', '\t', '\n', '\r', ',', '.', ';', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var word in words)
+                {
+                    if (!uniqueWords.ContainsKey(word))
+                    {
+                        uniqueWords[word] = true;
+                    }
+                    else
+                    {
+                    uniqueWords[word] = false;
+                    }
+                }
+            }
+
+            return uniqueWords.Where(pair => pair.Value == true).Select(pair => pair.Key).OrderBy(w => w, comparer).ToList();
         }
 
         /// <summary>
@@ -64,11 +164,38 @@ namespace UniqueWords
         /// <exception cref="ArgumentNullException"><see cref="StringBuilder"/> is null.</exception>
         public static void RemoveDuplicateWordsInStringBuilder(StringBuilder? stringBuilder)
         {
-            StringBuilder wordChars = new ();
-            HashSet<string> words = new ();
+            if (stringBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(stringBuilder));
+            }
 
-            // TODO #5. Analyze the method unit tests and add the method implementation.
-            throw new NotImplementedException();
+            string[] parts = Regex.Split(stringBuilder.ToString(), @"(\b[\p{L}]+\b|\W+)");
+
+            HashSet<string> uniqueWords = new HashSet<string>();
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                // Check if the part is a word
+                if (Regex.IsMatch(parts[i], @"\b[\p{L}]+\b"))
+                {
+                    string word = parts[i];
+                    if (!uniqueWords.Contains(word))
+                    {
+                        uniqueWords.Add(word);
+                    }
+                    else
+                    {
+                        parts[i] = string.Empty;
+                    }
+                }
+            }
+
+            stringBuilder.Clear();
+
+            foreach (string part in parts)
+            {
+                stringBuilder.Append(part);
+            }
         }
 
         /// <summary>
@@ -79,8 +206,32 @@ namespace UniqueWords
         /// <exception cref="ArgumentNullException"><see cref="text"/> is null.</exception>
         public static void RemoveDuplicateWordsInString(ref string? text, bool ignoreCase)
         {
-            // TODO #6. Analyze the method unit tests and add the method implementation.
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            string[] parts = Regex.Split(text, @"(\b[\p{L}]+\b|\W+)");
+
+            HashSet<string> uniqueWords = new HashSet<string>(ignoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if (Regex.IsMatch(parts[i], @"\b[\p{L}]+\b"))
+                {
+                    string word = parts[i];
+                    if (!uniqueWords.Contains(word))
+                    {
+                        uniqueWords.Add(word);
+                    }
+                    else
+                    {
+                        parts[i] = string.Empty;
+                    }
+                }
+            }
+
+            text = string.Concat(parts);
         }
     }
 }
